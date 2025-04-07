@@ -26,6 +26,15 @@ app.get("/api/progresos", (req, res) => {
   });
 });
 
+// Ruta de ejemplo: obtener tipos de movimientos
+app.get("/api/tiposmovimientos", (req, res) => {
+  const query = "SELECT * FROM tiposmovimientos";
+  db.all(query, [], (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(rows);
+  });
+});
+
 const PORT = 3001;
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
