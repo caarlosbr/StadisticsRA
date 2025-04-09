@@ -26,6 +26,9 @@ export default function Sidebar() {
         <Link as={RouterLink} to="/perfil">
           Perfil
         </Link>
+        <Link as={RouterLink} to="/entrenamientos">
+          Entrenamientos
+        </Link>
       </VStack>
     </Box>
   );

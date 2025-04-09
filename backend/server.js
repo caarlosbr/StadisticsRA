@@ -79,6 +79,86 @@ app.post("/api/login", (req, res) => {
 });
 
 
+// Ruta para guardar un entrenamiento
+app.post("/api/entrenamientos", (req, res) => {
+  console.log("📥 Recibido en backend:", req.body);
+  const { usuario_id, fecha } = req.body;
+
+  if (!usuario_id || !fecha) {
+    return res.status(400).json({ error: "Faltan datos" });
+  }
+
+  const query = `INSERT INTO entrenamientos (usuario_id, fecha) VALUES (?, ?)`;
+
+  db.run(query, [usuario_id, fecha], function (err) {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+
+    res.status(201).json({
+      message: "Entrenamiento guardado",
+      entrenamiento_id: this.lastID,
+    });
+  });
+});
+
+
+// Ruta para guardar una serie
+app.post("/api/series", (req, res) => {
+  const { entrenamiento_id, ejercicio_id, peso, repeticiones } = req.body;
+
+  if (!entrenamiento_id || !ejercicio_id || !peso || !repeticiones) {
+    return res.status(400).json({ error: "Faltan datos" });
+  }
+
+  const query = `INSERT INTO series (entrenamiento_id, ejercicio_id, peso, repeticiones) VALUES (?, ?, ?, ?)`;
+
+  db.run(query, [entrenamiento_id, ejercicio_id, peso, repeticiones], function (err) {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+
+    res.status(201).json({
+      message: "Serie añadida correctamente",
+      serie_id: this.lastID,
+    });
+  });
+});
+
+
+// Ruta para obtener los ejercicios un dia en concreto de un usuario en concreto
+app.get("/api/entrenamientos/:usuario_id/:fecha", (req, res) => {
+  const { usuario_id, fecha } = req.params;
+
+  const query = `
+    SELECT s.ejercicio_id, s.peso, s.repeticiones, tm.nombre_corto
+    FROM series s
+    JOIN entrenamientos e ON s.entrenamiento_id = e.id
+    JOIN tiposmovimientos tm ON s.ejercicio_id = tm.id
+    WHERE e.usuario_id = ? AND e.fecha = ?
+  `;
+
+  db.all(query, [usuario_id, fecha], (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+
+    // Agrupar por ejercicio_id
+    const agrupado = {};
+
+    rows.forEach(({ ejercicio_id, nombre_corto, peso, repeticiones }) => {
+      if (!agrupado[ejercicio_id]) {
+        agrupado[ejercicio_id] = {
+          nombre: nombre_corto,
+          series: [],
+        };
+      }
+      agrupado[ejercicio_id].series.push({ peso, repeticiones });
+    });
+
+    res.json(agrupado);
+  });
+});
+
+
 
 const PORT = 3001;
 app.listen(PORT, () => {
