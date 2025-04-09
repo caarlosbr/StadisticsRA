@@ -1,28 +1,17 @@
-import { useEffect, useState } from "react";
-import Grafica from "./views/Grafica.jsx";
-import { getProgresos } from "./api/progresosApi.js";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Landing from "./views/Landing";
+import Dashboard from "./views/Dashboard"; // Este mostrará la gráfica
+import Login from "./views/Login"; // Este mostrará el formulario de login
 
 function App() {
-  const [fechas, setFechas] = useState([]);
-  const [pesos, setPesos] = useState([]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const datos = await getProgresos();
-      const f = datos.map((item) => item.fecha);
-      const p = datos.map((item) => item.peso);
-      setFechas(f);
-      setPesos(p);
-    };
-
-    fetchData();
-  }, []);
-
   return (
-    <div className="App">
-      <h1 style={{ textAlign: "center" }}>Mi progreso en el gym 🏋️</h1>
-      <Grafica fechas={fechas} pesos={pesos} />
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/registrar" element={<Landing />} />
+      </Routes>
+    </Router>
   );
 }
 

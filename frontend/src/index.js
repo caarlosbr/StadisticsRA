@@ -4,14 +4,31 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
+// ✅ Chakra imports
+import { ChakraProvider, extendTheme } from "@chakra-ui/react";
+
+// 🎨 Tema personalizado con tu color y modo oscuro
+const theme = extendTheme({
+  config: {
+    initialColorMode: "dark",
+    useSystemColorMode: false,
+  }, fonts: {
+    heading: "Roboto, sans-serif",
+    body: "Roboto, sans-serif",
+  },
+  colors: {
+    brand: {
+      500: "#ca5c43", // Tu color principal
+      600: "#d02c12", // Un tono más oscuro para hover
+    },
+  },
+});
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <React.StrictMode>
+  <ChakraProvider theme={theme}>
     <App />
-  </React.StrictMode>
+  </ChakraProvider>
 );
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();

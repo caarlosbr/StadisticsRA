@@ -35,6 +35,51 @@ app.get("/api/tiposmovimientos", (req, res) => {
   });
 });
 
+// Ruta para registrar usuarios
+app.post("/api/registrar", (req, res) => {
+  const { nombre, correo, contraseña } = req.body;
+
+  if (!nombre || !correo || !contraseña) {
+    return res.status(400).json({ error: "Faltan datos" });
+  }
+
+  const query = `INSERT INTO usuarios (nombre, correo, contraseña) VALUES (?, ?, ?)`;
+
+  db.run(query, [nombre, correo, contraseña], function (err) {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+
+    res.status(201).json({ id: this.lastID, message: "Usuario registrado correctamente ✅" });
+  });
+});
+
+
+// Ruta para iniciar sesión
+app.post("/api/login", (req, res) => {
+  const { correo, contraseña } = req.body;
+
+  if (!correo || !contraseña) {
+    return res.status(400).json({ error: "Faltan datos" });
+  }
+
+  const query = `SELECT * FROM usuarios WHERE correo = ? AND contraseña = ?`;
+
+  db.get(query, [correo, contraseña], (err, row) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+
+    if (!row) {
+      return res.status(401).json({ error: "Credenciales incorrectas" });
+    }
+
+    res.json({ message: "Inicio de sesión exitoso", usuario: row });
+  });
+});
+
+
+
 const PORT = 3001;
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
